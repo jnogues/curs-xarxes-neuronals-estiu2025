@@ -45,7 +45,7 @@ lib_deps =
 #define PIN_ANALOG  A0
 
 // --- Constants del PID ---
-double Kp = 80.0;
+double Kp = 100.0;
 double Ki = 1.0;
 double Kd = 80.0;
 
