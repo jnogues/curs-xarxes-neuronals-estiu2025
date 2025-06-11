@@ -45,9 +45,9 @@ lib_deps =
 #define PIN_ANALOG  A0
 
 // --- Constants del PID ---
-double Kp = 50.0;
-double Ki = 5.0;
-double Kd = 0.5;
+double Kp = 80.0;
+double Ki = 1.0;
+double Kd = 80.0;
 
 // --- Sensor ---
 OneWire oneWire(PIN_TEMP);
