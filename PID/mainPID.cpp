@@ -59,8 +59,8 @@ Tasker tasker;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
 //Prototips de funcions
-void controlTemp(); //Tasca 1
-void blinkLED();    //Tasca 2
+void blinkLED();    //Tasca 1
+void controlTemp(); //Tasca 2
 
 void setup() 
 {
