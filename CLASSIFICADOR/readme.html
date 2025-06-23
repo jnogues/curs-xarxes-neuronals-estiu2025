@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Classificador Intel·ligent de Nivells amb ESP8266</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Permite que el texto se ajuste */
+            word-wrap: break-word;  /* Rompe palabras largas */
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #e9e9e9;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ccc;
+            margin: 40px 0;
+        }
+        strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>El Classificador Intel·ligent de Nivells amb ESP8266</h1>
+        <hr>
+
+        <h2>Objectiu del Projecte</h2>
+        <p>Volem construir un sistema capaç de classificar automàticament el nivell d'un senyal d'entrada (simulat amb un potenciòmetre o fotorresistència) en tres categories: <strong>"Baix" (Low)</strong>, <strong>"Mitjà" (Medium)</strong> i <strong>"Alt" (High)</strong>. La màgia? El nostre ESP8266 aprendrà a fer aquesta classificació utilitzant una <strong>xarxa neuronal</strong>, no amb <code>if/else</code> tradicionals!</p>
+        <hr>
+
+        <h2>Durada Estimada</h2>
+        <p>2-3 sessions (depenent del ritme i el nivell de detall en la discussió de conceptes).</p>
+        <hr>
+
+        <h2>Conceptes Clau que Aprendràs</h2>
+        <ul>
+            <li><strong>Intel·ligència Artificial (IA) / Machine Learning (ML):</strong> Què són i com una màquina pot "aprendre".</li>
+            <li><strong>Xarxes Neuronals:</strong> El "cervell" del nostre sistema.</li>
+            <li><strong>Dataset:</strong> El conjunt de dades amb què la nostra xarxa neuronal aprendrà.</li>
+            <li><strong>Entrenament:</strong> El procés on la xarxa neuronal aprèn del dataset.</li>
+            <li><strong>Inferència / Predicció:</strong> Com la xarxa neuronal fa servir el que ha après per prendre decisions noves.</li>
+            <li><strong>Normalització de Dades:</strong> Per què cal preparar les dades per a la xarxa neuronal.</li>
+            <li><strong>PlatformIO:</strong> L'entorn de desenvolupament per als nostres microcontroladors.</li>
+        </ul>
+        <hr>
+
+        <h2>Materials Necessaris</h2>
+        <ul>
+            <li>Targeta de desenvolupament <strong>ESP8266</strong> (NodeMCU, Wemos D1 Mini o similar).</li>
+            <li><strong>Potenciòmetre</strong> o <strong>fotorresistència (LDR)</strong>.</li>
+            <li><strong>3 LEDs</strong> (idealment de colors diferents, per exemple, vermell, verd, blau).</li>
+            <li><strong>3 Resistències</strong> per als LEDs (entre 220 Ohm i 330 Ohm).</li>
+            <li><strong>Protoboard</strong> (Breadboard).</li>
+            <li><strong>Cables jumper</strong> (mascle-mascle).</li>
+            <li>Ordinador amb <strong>Visual Studio Code</strong> i l'extensió <strong>PlatformIO</strong> instal·lada.</li>
+            <li><strong>Python 3</strong> instal·lat a l'ordinador.</li>
+        </ul>
+        <hr>
+
+        <h2>Pas 0: Preparació de l'Entorn i Introducció</h2>
+        <ol>
+            <li><strong>Configura VS Code i PlatformIO:</strong> Assegura't que tens Visual Studio Code i l'extensió PlatformIO correctament instal·lats i funcionals.</li>
+            <li><strong>Instal·la les Llibreries de Python:</strong> Obre el terminal del teu ordinador i executa la següent comanda per instal·lar les llibreries necessàries:
+<pre><code>pip install numpy matplotlib pandas
+</code></pre>
+            <p>(Si tens <code>python</code> i <code>python3</code> instal·lats, pot ser que hagis d'usar <code>pip3 install ...</code>.)</p>
+            </li>
+        </ol>
+        <hr>
+
+        <h2>Pas 1: El Dataset - Les Dades d'Aprenentatge del Nostre "Cervell"</h2>
+        <p>Perquè la nostra xarxa neuronal aprengui a classificar els nivells, necessita exemples. Aquests exemples els guardarem en un fitxer <code>.csv</code> (Comma Separated Values).</p>
+
+        <h3><code>lectures_sensor.csv</code></h3>
+        <p>Crea un fitxer anomenat <code>lectures_sensor.csv</code> a la mateixa carpeta on tindràs el teu script Python. Aquest fitxer tindrà dues columnes: <code>adc_value</code> (la lectura del sensor) i <code>class_label</code> (a quina categoria pertany aquesta lectura).</p>
+
+        <p><strong>Exemple de contingut per a <code>lectures_sensor.csv</code>:</strong></p>
+<pre><code class="language-csv">adc_value,class_label
+50,low
+120,low
+280,low
+350,medium
+480,medium
+690,medium
+750,high
+890,high
+1000,high
+290,low
+710,high
+</code></pre>
+        <p><strong>Consell:</strong> Pots crear aquest fitxer amb un editor de text simple o una fulla de càlcul (assegura't de guardar-lo com a CSV!). Com més varietat de dades tinguis i més ben representats estiguin els rangs de les tres classes, millor aprendrà la xarxa.</p>
+        <hr>
+
+        <h2>Pas 2: Entrenant el "Cervell" amb Python</h2>
+        <p>El cor del nostre projecte és l'script Python que s'encarregarà d'entrenar la xarxa neuronal amb les dades del CSV.</p>
+
+        <h3><code>classificador_llindars_nn_csv.py</code></h3>
+        <p>Crea un fitxer amb aquest nom i enganxa-hi el codi proporcionat. Aquest script carregarà el teu dataset, entrenarà una petita xarxa neuronal i finalment exportarà els "coneixements" de la xarxa a un format que l'ESP8266 pugui entendre.</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# --- Paràmetres Globals del Classificador de Llindars ---
+ADC_RANGE = (0, 1023) # Rang de l'ADC de l'ESP8266
+
+# Nom del fitxer CSV que conté el teu dataset
+DATASET_CSV_FILE = "lectures_sensor.csv" 
+
+# Definició de les classes i el seu one-hot encoding
+# ASSEGURA'T QUE AQUESTES ETIQUETES COINCIDEIXEN AMB LES DEL TU CSV
+CLASS_LABELS = {
+    "low": [1, 0, 0],    # One-hot encoding per a 'Low'
+    "medium": [0, 1, 0], # One-hot encoding per a 'Medium'
+    "high": [0, 0, 1]    # One-hot encoding per a 'High'
+}
+CLASS_NAMES = list(CLASS_LABELS.keys())
+NUM_CLASSES = len(CLASS_LABELS)
+
+# --- Funció de Càrrega de Dades des de CSV ---
+def load_data_from_csv(file_path):
+    print(f"Carregant dades des de '{file_path}'...")
+    try:
+        df = pd.read_csv(file_path)
+    except FileNotFoundError:
+        print(f"ERROR: El fitxer '{file_path}' no s'ha trobat. Assegura't que és a la mateixa carpeta que l'script.")
+        exit()
+    except Exception as e:
+        print(f"ERROR en llegir el CSV: {e}")
+        exit()
+
+    if 'adc_value' not in df.columns or 'class_label' not in df.columns:
+        print("ERROR: El CSV ha de contenir les columnes 'adc_value' i 'class_label'.")
+        exit()
+
+    all_data = df['adc_value'].values.reshape(-1, 1)
+    all_labels_text = df['class_label'].values
+
+    all_labels_one_hot = []
+    valid_indices = [] 
+    for i, label_text in enumerate(all_labels_text):
+        if label_text in CLASS_LABELS:
+            all_labels_one_hot.append(CLASS_LABELS[label_text])
+            valid_indices.append(i)
+        else:
+            print(f"AVÍS: Etiqueta de classe desconeguda trobada al CSV: '{label_text}' a la fila {i+2}. Saltant mostra.")
+            
+    X = all_data[valid_indices]
+    Y = np.array(all_labels_one_hot)
+
+    permutation = np.random.permutation(len(X))
+    X_shuffled = X[permutation]
+    Y_shuffled = Y[permutation]
+    
+    print(f"Dataset carregat amb {X_shuffled.shape[0]} mostres i {X_shuffled.shape[1]} característica.")
+    print(f"Les etiquetes estan en format one-hot encoding amb {Y_shuffled.shape[1]} classes.")
+
+    return X_shuffled, Y_shuffled
+
+
+# --- Normalització de Característiques ---
+FEATURE_RANGES = {
+    'adc_value': (float(ADC_RANGE[0]), float(ADC_RANGE[1]))
+}
+
+def normalize_features(features, feature_ranges):
+    normalized_features = []
+    min_val, max_val = feature_ranges['adc_value']
+    
+    for val in features:
+        if max_val == min_val:
+            normalized_features.append(0.0)
+        else:
+            normalized_features.append((val - min_val) / (max_val - min_val))
+    return np.array(normalized_features).reshape(-1, 1)
+
+# --- ENTRENAMENT DE LA XARXA NEURONAL "A PÈL" ---
+
+INPUT_DIM = 1
+HIDDEN_DIM = 5
+OUTPUT_DIM = NUM_CLASSES
+
+LEARNING_RATE = 0.05
+MAX_EPOCHS = 50000
+PATIENCE = 2000
+TARGET_LOSS = 0.01
+
+def relu(x):
+    return np.maximum(0, x)
+
+def relu_derivative(x):
+    return (x > 0).astype(float)
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x, axis=-1, keepdims=True)) 
+    return e_x / np.sum(e_x, axis=-1, keepdims=True)
+
+def initialize_weights(input_dim, hidden_dim, output_dim):
+    W1 = np.random.randn(input_dim, hidden_dim) * 0.01
+    b1 = np.zeros((1, hidden_dim))
+    W2 = np.random.randn(hidden_dim, output_dim) * 0.01
+    b2 = np.zeros((1, output_dim))
+    return W1, b1, W2, b2
+
+def forward_pass(X, W1, b1, W2, b2):
+    Z1 = np.dot(X, W1) + b1
+    A1 = relu(Z1)
+    Z2 = np.dot(A1, W2) + b2
+    A2 = softmax(Z2)
+    return Z1, A1, Z2, A2
+
+def compute_loss(Y_pred, Y_true):
+    epsilon = 1e-10
+    Y_pred = np.clip(Y_pred, epsilon, 1 - epsilon)
+    loss = -np.sum(Y_true * np.log(Y_pred)) / len(Y_true)
+    return loss
+
+def train_nn(X, Y, W1, b1, W2, b2, learning_rate, max_epochs, patience, target_loss):
+    losses = []
+    accuracies = []
+
+    best_loss = float('inf')
+    epochs_no_improve = 0
+    
+    best_W1, best_b1, best_W2, best_b2 = W1.copy(), b1.copy(), W2.copy(), b2.copy()
+
+    for epoch in range(max_epochs):
+        Z1, A1, Z2, A2 = forward_pass(X, W1, b1, W2, b2)
+        loss = compute_loss(A2, Y)
+        losses.append(loss)
+        
+        predictions = np.argmax(A2, axis=1)
+        true_labels = np.argmax(Y, axis=1)
+        accuracy = np.mean(predictions == true_labels)
+        accuracies.append(accuracy)
+
+        if loss <= target_loss:
+            print(f"\nObjectiu de pèrdua ({target_loss:.4f}) assolit a l'època {epoch+1}. Aturant entrenament.")
+            break 
+
+        if loss < best_loss:
+            best_loss = loss
+            epochs_no_improve = 0
+            best_W1, best_b1, best_W2, best_b2 = W1.copy(), b1.copy(), W2.copy(), b2.copy()
+        else:
+            epochs_no_improve += 1
+            if epochs_no_improve >= patience:
+                print(f"\nEarly stopping a l'època {epoch+1} (pèrdua no millora durant {patience} èpoques).")
+                break
+
+        dZ2 = A2 - Y 
+        dW2 = np.dot(A1.T, dZ2) / len(X)
+        db2 = np.sum(dZ2, axis=0, keepdims=True) / len(X)
+
+        dA1 = np.dot(dZ2, W2.T)
+        dZ1 = dA1 * relu_derivative(A1) 
+
+        dW1 = np.dot(X.T, dZ1) / len(X)
+        db1 = np.sum(dZ1, axis=0, keepdims=True) / len(X)
+
+        W1 -= learning_rate * dW1
+        b1 -= learning_rate * db1
+        W2 -= learning_rate * dW2
+        b2 -= learning_rate * db2
+        
+        if (epoch + 1) % (max_epochs // 500 or 1) == 0 or (epoch + 1) == 1 or (epoch + 1) == max_epochs:
+            print(f"Epoch {epoch+1}/{max_epochs}, Loss: {loss:.4f}, Accuracy: {accuracy:.4f}, Best Loss: {best_loss:.4f}, No Improve: {epochs_no_improve}")
+
+    print(f"\nEntrenament finalitzat. Millor precisió: {np.max(accuracies):.4f} (a l'època amb la millor pèrdua).")
+    return best_W1, best_b1, best_W2, best_b2, losses, accuracies
+
+# --- Quantització i Exportació dels Pesos a C/C++ ---
+
+def quantize_weights(weights):
+    min_float = np.min(weights)
+    max_float = np.max(weights)
+    
+    min_int = -127.0 
+    max_int = 127.0
+    
+    abs_max = max(abs(min_float), abs(max_float))
+    if abs_max == 0:
+        scale = 1.0
+    else:
+        scale = abs_max / max_int 
+    
+    quantized_weights = np.round(weights / scale).astype(np.int8)
+    
+    return quantized_weights, scale
+
+def generate_c_header(W1, b1, W2, b2, scale_W1, scale_b1, scale_W2, scale_b2, filename="nn_params_simple.h"):
+    """Genera un fitxer de capçalera C amb els pesos i biaixos per al model simple."""
+    with open(filename, 'w') as f:
+        f.write("#ifndef NN_PARAMS_SIMPLE_H\n")
+        f.write("#define NN_PARAMS_SIMPLE_H\n\n")
+
+        f.write(f"// Parameters for the Simple Neural Network model\n")
+        f.write(f"#define INPUT_DIM_SIMPLE {INPUT_DIM}\n")
+        f.write(f"#define HIDDEN_DIM_SIMPLE {HIDDEN_DIM}\n")
+        f.write(f"#define OUTPUT_DIM_SIMPLE {OUTPUT_DIM}\n\n")
+        f.write(f"// Class names for reference\n")
+        f.write(f"const char* CLASS_NAMES_SIMPLE[] = {{\n")
+        for name in CLASS_NAMES:
+            f.write(f"    \"{name}\",\n")
+        f.write(f"}};\n\n")
+
+        def write_array(name, arr, scale):
+            f.write(f"// {name} (shape: {arr.shape}, scale: {scale:.6f})\n")
+            f.write(f"const int8_t {name}_simple[{arr.size}] = {{\n    ")
+            f.write(", ".join(map(str, arr.flatten())))
+            f.write("\n};\n\n")
+            f.write(f"const float {name}_simple_scale = {scale:.6f}f;\n\n")
+
+        write_array("W1", W1, scale_W1)
+        write_array("b1", b1, scale_b1)
+        write_array("W2", W2, scale_W2)
+        f.write(f"// b2 (shape: {b2.shape}, scale: {scale_b2:.6f})\n")
+        f.write(f"const int8_t b2_simple[{b2.size}] = {{\n    ")
+        f.write(", ".join(map(str, b2.flatten())))
+        f.write("\n};\n\n")
+        f.write(f"const float b2_simple_scale = {sb2:.6f}f;\n\n")
+
+        f.write("#endif // NN_PARAMS_SIMPLE_H\n")
+    print(f"Fitxer de capçalera C '{filename}' generat amb èxit.")
+
+
+# --- Funció de Visualització del Dataset ---
+def plot_dataset(X, Y, feature_ranges, class_names):
+    print("\n--- Visualitzant el Dataset Carregat des del CSV ---")
+
+    plt.figure(figsize=(10, 6))
+    
+    colors = ['blue', 'green', 'red']
+    
+    for i in range(len(X)):
+        adc_value = X[i][0]
+        label_one_hot = Y[i]
+        
+        class_idx = np.argmax(label_one_hot)
+        
+        plt.scatter(adc_value, 0, color=colors[class_idx], alpha=0.6, s=50)
+
+    plt.title('Distribució del Dataset CSV per Classes')
+    plt.xlabel('Valor de l\'ADC')
+    plt.yticks([])
+    
+    plt.xlim(feature_ranges['adc_value'][0], feature_ranges['adc_value'][1])
+    plt.grid(True, axis='x', linestyle=':', alpha=0.7)
+
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], marker='o', color='w', label=class_names[0], markerfacecolor=colors[0], markersize=10),
+        Line2D([0], [0], marker='o', color='w', label=class_names[1], markerfacecolor=colors[1], markersize=10),
+        Line2D([0], [0], marker='o', color='w', label=class_names[2], markerfacecolor=colors[2], markersize=10),
+    ]
+    plt.legend(handles=legend_elements, loc='upper right')
+
+    plt.show()
+
+
+# --- Execució Principal del Script ---
+
+if __name__ == "__main__":
+    X_train, Y_train = load_data_from_csv(DATASET_CSV_FILE)
+
+    print("\n--- Informació del Dataset Carregat ---")
+    print(f"Forma de les característiques (X_train): {X_train.shape}")
+    print(f"Forma de les etiquetes (Y_train): {Y_train.shape}")
+    
+    X_train_normalized = normalize_features(X_train, FEATURE_RANGES)
+    print(f"Forma de les característiques normalitzades: {X_train_normalized.shape}")
+
+    # Descomenta la línia de sota per visualitzar el dataset carregat
+    # plot_dataset(X_train, Y_train, FEATURE_RANGES, CLASS_NAMES)
+
+    print("\n--- Entrenant la Xarxa Neuronal 'a pèl' amb dades del CSV ---")
+    W1, b1, W2, b2 = initialize_weights(INPUT_DIM, HIDDEN_DIM, OUTPUT_DIM)
+
+    W1_trained, b1_trained, W2_trained, b2_trained, losses, accuracies = train_nn(
+        X_train_normalized, Y_train, W1, b1, W2, b2, LEARNING_RATE, MAX_EPOCHS, PATIENCE, TARGET_LOSS
+    )
+
+    plt.figure(figsize=(10, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(losses)
+    plt.title('Pèrdua durant l\'Entrenament')
+    plt.xlabel('Època')
+    plt.ylabel('Pèrdua')
+    plt.grid(True)
+
+    plt.subplot(1, 2, 2)
+    plt.plot(accuracies)
+    plt.title('Precisió durant l\'Entrenament')
+    plt.xlabel('Època')
+    plt.ylabel('Precisió')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    print("\n--- Quantitzant i Exportant Pesos a C/C++ ---")
+    
+    qW1, sW1 = quantize_weights(W1_trained)
+    qb1, sb1 = quantize_weights(b1_trained)
+    qW2, sW2 = quantize_weights(W2_trained)
+    qb2, sb2 = quantize_weights(b2_trained) 
+
+    generate_c_header(
+        qW1, qb1, 
+        qW2, qb2, 
+        sW1, sb1, 
+        sW2, sb2,
+        filename="nn_params_simple.h"
+    )
+    
+    print("\n--- Rangos de Caracteristicas para C/C++ (para la única característica 'adc_value') ---")
+    for key, value in FEATURE_RANGES.items():
+        print(f"const float FEATURE_MIN_{key} = {value[0]:.6f}f;")
+        print(f"const float FEATURE_MAX_{key} = {value[1]:.6f}f;\n")
+
+    print("\nScript completat. El model de classificador de llindars ha estat entrenat amb dades del CSV i els pesos exportats a C/C++.")
+</code></pre>
+        <hr>
+
+        <h2>Pas 3: El nostre "Cervell" a l'ESP8266 (C++ a PlatformIO)</h2>
+        <p>Ara que tenim el "cervell" (els pesos de la xarxa neuronal) en un format C++, el pujarem al nostre ESP8266.</p>
+
+        <h3>Connexions Físiques</h3>
+        <p>Connecta els components al teu ESP8266 de la següent manera:</p>
+        <ul>
+            <li><strong>Potenciòmetre/LDR:</strong>
+                <ul>
+                    <li>Un extrem a <strong>GND</strong>.</li>
+                    <li>L'altre extrem a <strong>3.3V</strong>.</li>
+                    <li>El pin central (o el pin de sortida de l'LDR amb la resistència) al pin <strong>A0</strong> de l'ESP8266.</li>
+                </ul>
+            </li>
+            <li><strong>LED per a "LOW" (lògica negativa):</strong>
+                <ul>
+                    <li>Càtode (pata curta) del LED al pin <strong>GPIO0</strong>.</li>
+                    <li>Ànode (pata llarga) del LED a una resistència de 220-330 Ohm.</li>
+                    <li>L'altre extrem de la resistència a <strong>3.3V</strong>.</li>
+                    <li><em>(Recorda que GPIO0 pot tenir un comportament especial en l'arrencada de l'ESP8266, però per a un LED de sortida normalment funciona bé una vegada ha arrencat.)</em></li>
+                </ul>
+            </li>
+            <li><strong>LED per a "MEDIUM" (lògica negativa):</strong>
+                <ul>
+                    <li>Càtode (pata curta) del LED al pin <strong>GPIO2</strong>.</li>
+                    <li>Ànode (pata llarga) del LED a una resistència de 220-330 Ohm.</li>
+                    <li>L'altre extrem de la resistència a <strong>3.3V</strong>.</li>
+                </ul>
+            </li>
+            <li><strong>LED per a "HIGH" (lògica positiva):</strong>
+                <ul>
+                    <li>Ànode (pata llarga) del LED al pin <strong>GPIO13</strong>.</li>
+                    <li>Càtode (pata curta) del LED a una resistència de 220-330 Ohm.</li>
+                    <li>L'altre extrem de la resistència a <strong>GND</strong>.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3><code>src/main.cpp</code></h3>
+        <p>Aquest és el codi que s'executarà al teu ESP8266. Substitueix el contingut del teu <code>src/main.cpp</code> al projecte PlatformIO per aquest:</p>
+<pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+#include "nn_params_simple.h" // Inclou els teus paràmetres de la NN simple generats per Python
+#include &lt;math.h&gt; // Per a expf
+
+// --- Definició dels LEDs ---
+#define LED_LOW_PIN    0  // GPIO0 per a la classe "low" (lògica negativa)
+#define LED_MEDIUM_PIN 2  // GPIO2 per a la classe "medium" (lògica negativa)
+#define LED_HIGH_PIN   13 // GPIO13 per a la classe "high" (lògica positiva)
+
+// --- Rang de l'ADC (ha de coincidir amb el Python) ---
+#define ADC_RANGE_MIN 0
+#define ADC_RANGE_MAX 1023
+
+// --- Constants de rang per normalització (MOLT IMPORTANT: Copia AQUESTS valors del teu Python) ---
+// Executa el script Python "classificador_llindars_nn_csv.py", COPIA la sortida del bloc:
+// "--- Rangos de Caracteristicas para C/C++ (para la única característica 'adc_value') ---"
+// y engancha-la a continuació, reemplaçant els valors d'exemple.
+
+const float FEATURE_MIN_adc_value = 0.000000f; // <--- REEMPLAÇA AMB ELS TEUS VALORS REALS DEL PYTHON
+const float FEATURE_MAX_adc_value = 1023.000000f; // <--- REEMPLAÇA AMB ELS TEUS VALORS REALS DEL PYTHON
+
+// --- Funcions Bàsiques de la Xarxa Neuronal en C/C++ ---
+
+float relu(float x) {
+    return (x > 0) ? x : 0.0f;
+}
+
+void softmax(float* input, int size) {
+    float max_val = input[0];
+    for (int i = 1; i < size; i++) {
+        if (input[i] > max_val) {
+            max_val = input[i];
+        }
+    }
+
+    float sum_exp = 0.0f;
+    for (int i = 0; i < size; i++) {
+        input[i] = expf(input[i] - max_val);
+        sum_exp += input[i];
+    }
+
+    for (int i = 0; i < size; i++) {
+        input[i] /= sum_exp;
+    }
+}
+
+void matrix_vector_multiply(const int8_t* W, float W_scale, const float* X, int input_dim, int output_dim, float* result) {
+    for (int j = 0; j < output_dim; j++) {
+        float sum = 0.0f;
+        for (int i = 0; i < input_dim; i++) {
+            sum += ((float)W[i * output_dim + j] * W_scale) * X[i];
+        }
+        result[j] = sum;
+    }
+}
+
+void add_bias(float* input_vector, const int8_t* b, float b_scale, int size) {
+    for (int i = 0; i < size; i++) {
+        input_vector[i] += (float)b[i] * b_scale;
+    }
+}
+
+// --- Funció de Predicció Principal de la Xarxa Neuronal ---
+void predict_nn_simple(float adc_value_normalized, float* output_probabilities) {
+    float features_normalized[INPUT_DIM_SIMPLE];
+    features_normalized[0] = adc_value_normalized;
+
+    float hidden_layer_output[HIDDEN_DIM_SIMPLE];
+    matrix_vector_multiply(W1_simple, W1_simple_scale, features_normalized, INPUT_DIM_SIMPLE, HIDDEN_DIM_SIMPLE, hidden_layer_output);
+    add_bias(hidden_layer_output, b1_simple, b1_simple_scale, HIDDEN_DIM_SIMPLE);
+
+    for (int i = 0; i < HIDDEN_DIM_SIMPLE; i++) {
+        hidden_layer_output[i] = relu(hidden_layer_output[i]);
+    }
+
+    float output_layer_raw[OUTPUT_DIM_SIMPLE];
+    matrix_vector_multiply(W2_simple, W2_simple_scale, hidden_layer_output, HIDDEN_DIM_SIMPLE, OUTPUT_DIM_SIMPLE, output_layer_raw);
+    add_bias(output_layer_raw, b2_simple, b2_simple_scale, OUTPUT_DIM_SIMPLE);
+
+    softmax(output_layer_raw, OUTPUT_DIM_SIMPLE);
+
+    for (int i = 0; i < OUTPUT_DIM_SIMPLE; i++) {
+        output_probabilities[i] = output_layer_raw[i];
+    }
+}
+
+// --- Normalització de la Lectura de l'ADC ---
+float normalize_adc_value(float value) {
+    if (FEATURE_MAX_adc_value == FEATURE_MIN_adc_value) {
+        return 0.0f; 
+    }
+    return (value - FEATURE_MIN_adc_value) / (FEATURE_MAX_adc_value - FEATURE_MIN_adc_value);
+}
+
+// --- Funció per controlar els LEDs ---
+void controlLeds(int predicted_class_idx) {
+    // Apaguem tots els LEDs primer per assegurar-nos que només n'hi ha un encès
+    digitalWrite(LED_LOW_PIN, HIGH);    // HIGH per apagar LED lògica negativa (GPIO0)
+    digitalWrite(LED_MEDIUM_PIN, HIGH); // HIGH per apagar LED lògica negativa (GPIO2)
+    digitalWrite(LED_HIGH_PIN, LOW);    // LOW per apagar LED lògica positiva (GPIO13)
+
+    // Encenem el LED corresponent segons la classe predita
+    if (predicted_class_idx == 0) { // Si és "low" (correspon a l'índex 0 de CLASS_NAMES_SIMPLE)
+        digitalWrite(LED_LOW_PIN, LOW); // LOW per encendre LED lògica negativa
+        Serial.println("  -> LOW LED ON");
+    } else if (predicted_class_idx == 1) { // Si és "medium" (correspon a l'índex 1)
+        digitalWrite(LED_MEDIUM_PIN, LOW); // LOW per encendre LED lògica negativa
+        Serial.println("  -> MEDIUM LED ON");
+    } else if (predicted_class_idx == 2) { // Si és "high" (correspon a l'índex 2)
+        digitalWrite(LED_HIGH_PIN, HIGH); // HIGH per encendre LED lògica positiva
+        Serial.println("  -> HIGH LED ON");
+    }
+}
+
+
+// --- Configuració de PlatformIO i Loop Principal ---
+
+void setup() {
+    Serial.begin(115200); // Velocitat de baudis per comunicació serial
+    while (!Serial && !Serial.availableForWrite()) {
+        delay(10);
+    }
+    Serial.println("\n--- ESP8266 Simple NN Classifier Ready! ---");
+    Serial.println("Reading A0, predicting class, and controlling LEDs...");
+
+    // Configuració dels pins dels LEDs com a sortides
+    pinMode(LED_LOW_PIN, OUTPUT);
+    pinMode(LED_MEDIUM_PIN, OUTPUT);
+    pinMode(LED_HIGH_PIN, OUTPUT);
+
+    // Inicialment, apaguem tots els LEDs
+    digitalWrite(LED_LOW_PIN, HIGH);    // Lògica negativa: HIGH = OFF
+    digitalWrite(LED_MEDIUM_PIN, HIGH); // Lògica negativa: HIGH = OFF
+    digitalWrite(LED_HIGH_PIN, LOW);    // Lògica positiva: LOW = OFF
+}
+
+void loop() {
+    int raw_adc_value = analogRead(A0);
+    float normalized_adc_value = normalize_adc_value((float)raw_adc_value);
+
+    float output_probabilities[OUTPUT_DIM_SIMPLE]; 
+    predict_nn_simple(normalized_adc_value, output_probabilities);
+
+    int predicted_class_idx = 0;
+    float max_prob = -1.0f;
+    for (int i = 0; i < OUTPUT_DIM_SIMPLE; i++) {
+        if (output_probabilities[i] > max_prob) {
+            max_prob = output_probabilities[i];
+            predicted_class_idx = i;
+        }
+    }
+
+    // --- Sortida per Teleplot ---
+    Serial.print("#");
+    Serial.print("raw_adc:"); Serial.print(raw_adc_value);
+    Serial.print(",norm_adc:"); Serial.print(normalized_adc_value, 4);
+    
+    for (int i = 0; i < OUTPUT_DIM_SIMPLE; i++) {
+        Serial.print(",");
+        Serial.print(CLASS_NAMES_SIMPLE[i]);
+        Serial.print(":");
+        Serial.print(output_probabilities[i], 4);
+    }
+    Serial.print(",predicted_idx:"); Serial.print(predicted_class_idx);
+    Serial.print(",confidence:"); Serial.print(max_prob, 4);
+    Serial.println();
+
+    // --- Sortida per al Monitor Serial normal (per depuració) ---
+    Serial.print("Raw ADC: "); Serial.print(raw_adc_value);
+    Serial.print(", Norm ADC: "); Serial.print(normalized_adc_value, 4);
+    Serial.print(", Probabilities: [");
+    for (int i = 0; i < OUTPUT_DIM_SIMPLE; i++) {
+        Serial.print(CLASS_NAMES_SIMPLE[i]);
+        Serial.print(":");
+        Serial.print(output_probabilities[i], 4); 
+        if (i < OUTPUT_DIM_SIMPLE - 1) Serial.print(", ");
+    }
+    Serial.println("]");
+    Serial.printf("Predicted Class: %s (Confidence: %.2f%%)\n", CLASS_NAMES_SIMPLE[predicted_class_idx], max_prob * 100.0f);
+    
+    // Controlar els LEDs segons la predicció
+    controlLeds(predicted_class_idx);
+    
+    delay(500);
+}
+</code></pre>
+        <hr>
+
+        <h2>Pas 4: Prova el teu Classificador Intel·ligent!</h2>
+        <ol>
+            <li>Un cop el codi s'hagi pujat correctament, <strong>tanca el monitor serial de PlatformIO</strong> si el tens obert (és important per a Teleplot).</li>
+            <li>Obre <strong>Teleplot</strong> al teu navegador web (o l'aplicació d'escriptori).</li>
+            <li>A Teleplot, selecciona el <strong>port serial correcte</strong> (el del teu ESP8266) i la <strong>velocitat de baudis (115200)</strong>.</li>
+            <li>Clica "Connect".</li>
+            <li><strong>Ara, varia el valor d'entrada analògica</strong> del teu potenciòmetre o LDR. Observa com:
+                <ul>
+                    <li>Les lectures de l'ADC canvien al gràfic.</li>
+                    <li>Les probabilitats de les classes "low", "medium", "high" es modifiquen.</li>
+                    <li><strong>El LED corresponent a la classe predita s'encén!</strong></li>
+                </ul>
+            </li>
+        </ol>
+        <p><strong>Enhorabona!</strong> Has fet que el teu ESP8266 aprengui a classificar nivells utilitzant una xarxa neuronal. Això és IA en un dispositiu petit!</p>
+        <hr>
+
+        <h2>Per Anar Més Enllà (Opcional)</h2>
+        <ul>
+            <li><strong>Juga amb el <code>TARGET_LOSS</code>:</strong> Prova a posar un valor més baix (p. ex., <code>0.005</code>) al <code>classificador_llindars_nn_csv.py</code> i veu si la xarxa s'entrena més temps i la precisió millora. Què passa si el poses massa baix?</li>
+            <li><strong>Canvia <code>HIDDEN_DIM</code>:</strong> Modifica el número de neurones a la capa oculta (<code>HIDDEN_DIM</code>) al Python (p. ex., a 3 o a 10). Com afecta a l'entrenament i als resultats?</li>
+            <li><strong>Crea un Dataset Propio:</strong> Si tens temps, recopila les teves pròpies dades amb el sensor real i actualitza el <code>lectures_sensor.csv</code>. Aquest és el pas més realista en un projecte de ML!</li>
+            <li><strong>Altres Sensors:</strong> Quins altres sensors podríem classificar amb una xarxa neuronal? (Temperatura, humitat, so, etc.)</li>
+        </ul>
+    </div>
+</body>
+</html>
