@@ -47,7 +47,7 @@ La xarxa neuronal aprendrà a mapejar una temperatura d'entrada a un valor PWM d
 | 50.3        | 50     |
 | 50.5        | 10     |
 
-Com podeu veure, a temperatures baixes el PWM és alt (calfa més), i a temperatures altes (per sobre de 50°C), el PWM disminueix dràsticament.
+Com podeu veure, a temperatures baixes el PWM és alt (escalfa més), i a temperatures altes (per sobre de 50°C), el PWM disminueix dràsticament.
 
 ---
 ### **Fase 1: Entrenament de la Xarxa Neuronal (Generació dels Pesos)**
@@ -56,7 +56,7 @@ L'objectiu d'aquesta fase és generar els pesos i biaixos òptims per a la nostr
 
 **Fitxers clau per a l'Entrenament:**
 
-1.  **`dataset50C.csv` (No proporcionat directament, s'ha de crear amb la taula de dalt):**
+1.  **`dataset50C.csv`:**
     * Aquest fitxer CSV contindrà el *dataset* de temperatura i PWM en format de text pla.
 2.  **`normalize_csv_to_train_nn.py`:**
     * Aquest script Python és el **primer pas de l'entrenament**.
