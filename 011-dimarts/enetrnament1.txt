@@ -1,0 +1,57 @@
+// Pesos i biaixos en format per copiar al codi Arduino:
+float weights_input_hidden1[hidden1_neurons] = {
+    10.456506, -9.732830, -6.555914, -1.428486, 0.237145
+};
+
+float weights_hidden1_hidden2[hidden1_neurons][hidden2_neurons] = {
+    { 8.197008, 7.082556, -6.565144 },
+    { -1.623327, -1.463329, 5.345986 },
+    { -6.313164, -5.839029, 2.155800 },
+    { -1.974989, -1.472749, -1.023958 },
+    { -1.275379, -1.430184, -1.624968 }
+};
+
+float weights_hidden2_output[hidden2_neurons] = {
+    -6.608902, -6.065195, 8.105287
+};
+
+float bias_hidden1[hidden1_neurons] = {
+    -8.559329, -1.042980, 6.095777, 0.961382, 2.080320
+};
+
+float bias_hidden2[hidden2_neurons] = {
+    -2.706071, -2.609028, -1.391937
+};
+
+float bias_output = 
+    -0.534228;
+
+
+
+// Pesos i biaixos en format per copiar al codi Arduino:
+float weights_input_hidden1[hidden1_neurons] = {
+    2.342184, -3.499474, 7.472236, -8.273430, 4.473033
+};
+
+float weights_hidden1_hidden2[hidden1_neurons][hidden2_neurons] = {
+    { -1.976171, -1.355278, 1.123294 },
+    { 2.381539, 2.035939, -4.614745 },
+    { -7.197997, -1.135755, 0.636513 },
+    { 1.696426, 4.779124, -11.652722 },
+    { -2.341656, -3.843585, 4.390120 }
+};
+
+float weights_hidden2_output[hidden2_neurons] = {
+    5.758445, 1.828496, -8.763787
+};
+
+float bias_hidden1[hidden1_neurons] = {
+    -0.743730, 2.314878, -0.355552, 6.797288, -2.909866
+};
+
+float bias_hidden2[hidden2_neurons] = {
+    -0.653985, -1.483059, -1.660262
+};
+
+float bias_output = 
+    -0.622661;
