@@ -1,5 +1,5 @@
 //Inici doc-----------------------------------------------------
-//Exercici-10 Versio 06-06-2025
+//Exercici-003 Versio 06-06-2025
 //Curs xarxes neuronals estiu 2025
 //I2SB, Institut Industria Sostenible de Barcelona
 //Jaume Nogues jnogues@irp.cat
