@@ -19,26 +19,29 @@ L'**Exercici-002** té com a objectiu principal:
 
 Utilitzarem el següent *dataset* per entrenar la nostra xarxa, que mapeja valors d'ADC a categories:
 
-adc_value,class_label
-0,low
-10,low
-50,low
-110,low
-120,low
-280,low
-290,low
-310,medium
-350,medium
-420,medium
-480,medium
-500,medium
-690,medium
-710,high
-750,high
-890,high
-950,high
-1000,high
-1023,high
+| adc_value | class_label |
+|-----------|-------------|
+| 0         | low         |
+| 10        | low         |
+| 50        | low         |
+| 110       | low         |
+| 120       | low         |
+| 280       | low         |
+| 290       | low         |
+| 310       | medium      |
+| 350       | medium      |
+| 420       | medium      |
+| 480       | medium      |
+| 500       | medium      |
+| 690       | medium      |
+| 710       | high        |
+| 750       | high        |
+| 890       | high        |
+| 950       | high        |
+| 1000      | high        |
+| 1023      | high        |
+
+
 Aquestes dades simulen les lectures d'un sensor (per exemple, un potenciòmetre o una fotorresistència) i la seva classificació manual per crear un conjunt d'entrenament.
 
 ---
