@@ -128,3 +128,5 @@ Amb els pesos i biaixos entrenats, la nostra ESP8266 pot utilitzar la xarxa neur
 
 ---
 Aquest exercici és una gran demostració del potencial de les xarxes neuronals en sistemes encastats per a aplicacions de control! Qualsevol dubte o problema en qualsevol fase, pregunteu! 🚀
+---
+**Bonus track, si vols entrenar la xarxa a l'ESP8266 enlloc de l'script de python,  ho pots fer amb train_nn_50C_esp.cpp**
