@@ -125,8 +125,8 @@ Amb els pesos i biaixos entrenats, la nostra ESP8266 pot utilitzar la xarxa neur
 * **Xarxa de dues capes ocultes (1-5-3-1):** Una arquitectura més potent per a problemes no lineals.
 * **Cicle complet:** Des de la generació de dades i l'entrenament Python fins a la implementació en temps real a l'ESP8266.
 * **Importància de la normalització:** Crucial per a l'entrenament i la inferència.
-
+* **Bonus track, si vols entrenar la xarxa a l'ESP8266 enlloc de l'script de python,  ho pots fer amb train_nn_50C_esp.cpp**
 ---
 Aquest exercici és una gran demostració del potencial de les xarxes neuronals en sistemes encastats per a aplicacions de control! Qualsevol dubte o problema en qualsevol fase, pregunteu! 🚀
 ---
-**Bonus track, si vols entrenar la xarxa a l'ESP8266 enlloc de l'script de python,  ho pots fer amb train_nn_50C_esp.cpp**
+
