@@ -1,6 +1,7 @@
 Super dijous.
 
 * Per entrenar la xarxa tenim un [Google Colab](https://colab.research.google.com/drive/11-q7iKI3ELDgvOzC-MVxOgNGuPSy8s3w?usp=sharing)
+* El resultat és un fitxer de nom: nn_params_micropython.json
 * El dataset, tot i que ja està a l'script, és:
 
 | temperatura | pwm  |
