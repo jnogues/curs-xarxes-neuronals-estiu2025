@@ -1,7 +1,11 @@
 Super dijous.
-
+* Es tracta d'implementar la xarxa neuronal en un ESP32 i micropython
+* Instal·larem com a IDE [Thonny](https://thonny.org/)
+* Després cal flashejar l'ESP32 amb la imtge de micropython.  
 * Per entrenar la xarxa tenim un [Google Colab](https://colab.research.google.com/drive/11-q7iKI3ELDgvOzC-MVxOgNGuPSy8s3w?usp=sharing)
+* Hem de descarregar al dispositiu tots els fitxers.
 * El resultat és un fitxer de nom: nn_params_micropython.json
+* I ara ja podem correr els scripts.
 * El dataset, tot i que ja està a l'script, és:
 
 | temperatura | pwm  |
