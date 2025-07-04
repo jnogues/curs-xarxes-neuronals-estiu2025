@@ -38,7 +38,9 @@ DallasTemperature sensors(&oneWire);
 
 void setup() {
   Serial.begin(115200);
+  delay(1000);
   sensors.begin(); // Inicialitza el sensor DS18B20
+  sensors.setResolution(12);//9, 10, 11 o 12 bits.  94ms, 190ms, 380ms, 750ms. 0.5°C, 0.25°C, 0.125°C, or 0.0625°C.
   pinMode(HEATER_PIN, OUTPUT);
   Serial.println("--- Prova de DS18B20 i control de calefactor amb PlatformIO ---");
 }
