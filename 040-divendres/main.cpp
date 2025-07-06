@@ -28,7 +28,6 @@ lib_deps =
 
 */
 
-
 #include <Arduino.h>
 #include <OneWire.h>            // Llibreria per al bus OneWire del DS18B20
 #include <DallasTemperature.h>  // Llibreria per al sensor DS18B20
@@ -53,6 +52,18 @@ const String POWER_LABELS[] = {"Poca Potència", "Potència Mitjana-Baixa", "Pot
 
 // --- 2. Funcions de Pertinença (Fuzzificació) ---
 // Funcions de pertinença triangular i trapezoidal
+float trapezoidal_left_mf(float x, float a, float b) {
+  if (x <= a) return 1.0;
+  if (x >= a && x <= b) return (b - x) / (b - a);
+  return 0.0;
+}
+
+float trapezoidal_right_mf(float x, float a, float b) {
+  if (x >= b) return 1.0;
+  if (x >= a && x <= b) return (x - a) / (b - a);
+  return 0.0;
+}
+
 float triangular_membership(float x, float a, float b, float c) {
   if (x <= a || x >= c) return 0.0;
   if (x >= a && x <= b) return (x - a) / (b - a);
@@ -83,20 +94,30 @@ TemperatureMemberships fuzzify_temperature(float temp) {
   
   // Els rangs s'ajusten per a les 5 categories, ara el control difús va fins a 51.0C
   // Molt Freda (MF): 46.0 - 47.5 (Pic 46.0 - 46.5)
-  tm.molt_freda = trapezoidal_membership(temp, 48.0, 48.0, 48.0, 49.0); 
+  //tm.molt_freda = trapezoidal_membership(temp, 48.0, 48.0, 48.0, 49.0); 
+  // Molt Freda (MF): 1.0 per sota de 48.0, 0.0 a 48.5
+  tm.molt_freda = trapezoidal_left_mf(temp, 48.0, 48.5); 
 
   // Freda (F): 47.0 - 48.5 (Pic 47.5)
-  tm.freda = triangular_membership(temp, 48.0, 49.0, 50.0);
+  //tm.freda = triangular_membership(temp, 48.0, 49.0, 50.0);
+  // Freda (F): 0.0 a 48.0, 1.0 a 48.75, 0.0 a 49.5
+  tm.freda = triangular_membership(temp, 48.0, 48.75, 49.5);
 
   // OK (OK): 48.0 - 50.0 (Pic 49.0) <-- Ampliada lleugerament per solapar millor
-  tm.ok = triangular_membership(temp, 49.7, 50.0, 50.3);
+  //tm.ok = triangular_membership(temp, 49.7, 50.0, 50.3);
+  // Normal (N): 0.0 a 49.0, 1.0 a 50.0, 0.0 a 51.0
+  tm.ok = triangular_membership(temp, 49.0, 50.0, 51.0);
 
   // Càlida (C): 49.5 - 51.0 (Pic 50.5) <-- El pic es desplaça fins a 50.5, i baixa a 0.0 a 51.0
-  tm.calida = triangular_membership(temp, 50.0, 50.5, 51.0);
+  //tm.calida = triangular_membership(temp, 50.0, 50.5, 51.0);
+  // Càlida (A): 0.0 a 50.5, 1.0 a 51.25, 0.0 a 52.0
+  tm.calida = triangular_membership(temp, 50.5, 51.25, 52.0);
 
   // Molt Càlida (MC): 50.0 - 51.0 (Pic 51.0) <-- Comença a 50.0, arriba a 1.0 a 51.0 i es manté
   // Usarem un trapezi dret on el punt 'c' i 'd' seran el mateix valor final (51.0)
-  tm.molt_calida = trapezoidal_membership(temp, 50.5, 51.0, 51.0, 51.0 + 0.1); // El +0.1 és una petita estratagema per garantir el trapezi dret perfecte.
+  //tm.molt_calida = trapezoidal_membership(temp, 50.5, 51.0, 51.0, 51.0 + 0.1); // El +0.1 és una petita estratagema per garantir el trapezi dret perfecte.
+  // Molt Càlida (MA): 0.0 a 51.5, 1.0 a 52.0 (i es manté 1.0)
+  tm.molt_calida = trapezoidal_right_mf(temp, 51.5, 52.0); 
 
   return tm;
 }
